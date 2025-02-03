@@ -1,0 +1,21 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Involve-Bold.ttf",
+      "sha1": "4b4963fffbb7c44a7d413e6906fa5babdbcf129c"
+    },
+    {
+      "path": "src/assets/fonts/Involve-Medium.ttf",
+      "sha1": "831c67f319325af9f9b642ebaf27bc603a7d4fa7"
+    },
+    {
+      "path": "src/assets/fonts/Involve-Regular.ttf",
+      "sha1": "40ecb2b6ca9c06e5eb534c337bbb2561fe91e752"
+    },
+    {
+      "path": "src/assets/fonts/Involve-SemiBold.ttf",
+      "sha1": "4c5054922f69eeed9ff4e11811b73bf7bbbb4414"
+    }
+  ]
+}
