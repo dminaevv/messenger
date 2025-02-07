@@ -10,8 +10,10 @@ import ChatDetailScreen from './src/screens/chats/chatDetail';
 import ErrorBoundary from './src/components/errorBoundary';
 import AuthScreen from './src/screens/auth/auth';
 import { AppProvider } from './src/contexts/appContext';
-import RegistrationScreen from './src/screens/register/regiser';
+import RegistrationScreen from './src/screens/register/register';
 import { colors } from './src/config/colors';
+import ChatSettingsScreen from './src/screens/chats/chatSettings';
+import { MenuProvider } from 'react-native-popup-menu';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -52,33 +54,40 @@ function MainTabNavigator() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <ErrorBoundary>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Auth">
-            <Stack.Screen
-              name="Auth"
-              component={AuthScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Registration"
-              component={RegistrationScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Home"
-              component={MainTabNavigator}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ChatDetail"
-              component={ChatDetailScreen}
-              options={{ headerShown: false }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ErrorBoundary>
-    </AppProvider>
+    <MenuProvider>
+      <AppProvider>
+        <ErrorBoundary>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Auth">
+              <Stack.Screen
+                name="Auth"
+                component={AuthScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Registration"
+                component={RegistrationScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Home"
+                component={MainTabNavigator}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ChatDetail"
+                component={ChatDetailScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ChatSettings"
+                component={ChatSettingsScreen}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ErrorBoundary>
+      </AppProvider>
+    </MenuProvider>
   );
 }

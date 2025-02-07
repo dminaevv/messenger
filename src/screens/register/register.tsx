@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View, TextInput, StyleSheet } from 'react-native';
 import { colors } from '../../config/colors';
-import { Alert } from 'react-native';
 
 export default function RegistrationScreen({ navigation }: any) {
     const [login, setLogin] = useState<string | null>(null);
@@ -9,20 +8,6 @@ export default function RegistrationScreen({ navigation }: any) {
     const [confirmPassword, setConfirmPassword] = useState<string | null>(null);
 
     const handleRegistration = () => {
-        // if (!login || login.trim().length < 2) {
-        //     Alert.alert('Введите корректное имя (минимум 2 символа).');
-        //     return;
-        // }
-        // if (!password || password.length < 6) {
-        //     Alert.alert('Пароль должен быть не менее 6 символов.');
-        //     return;
-        // }
-        // if (password !== confirmPassword) {
-        //     Alert.alert('Пароли не совпадают.');
-        //     return;
-        // }
-
-        // Alert.alert('Регистрация успешна!');
 
         navigation.navigate('Home')
     };
@@ -30,19 +15,19 @@ export default function RegistrationScreen({ navigation }: any) {
     return (
         <View style={styles.container}>
             <View>
-                <Text style={styles.title}>Регистрация</Text>
-                <Text style={styles.subtitle}>Создайте новый аккаунт</Text>
+                <Text style={styles.title}>Registration</Text>
+                <Text style={styles.subtitle}>Create a new account</Text>
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Логин"
+                    placeholder="Username"
                     value={login ?? ''}
                     onChangeText={setLogin}
                 />
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Придумайте пароль"
+                    placeholder="Create a password"
                     value={password ?? ''}
                     onChangeText={setPassword}
                     secureTextEntry
@@ -50,19 +35,19 @@ export default function RegistrationScreen({ navigation }: any) {
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Подтвердите пароль"
+                    placeholder="Confirm password"
                     value={confirmPassword ?? ''}
                     onChangeText={setConfirmPassword}
                     secureTextEntry
                 />
 
                 <TouchableOpacity onPress={() => navigation.navigate('Auth')}>
-                    <Text style={styles.recoveryText} >Уже есть аккаунт</Text>
+                    <Text style={styles.recoveryText}>Already have an account</Text>
                 </TouchableOpacity>
             </View>
 
             <TouchableOpacity style={styles.button} onPress={handleRegistration}>
-                <Text style={styles.buttonText}>Зарегистрироваться</Text>
+                <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
         </View>
     );

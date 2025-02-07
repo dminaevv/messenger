@@ -1,15 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { format, isToday, isYesterday, isThisWeek, isThisYear } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../config/colors';
-import { ChatItem, chatsData } from '../../config/data';
+import { ChatItem, chatsData, User } from '../../config/data';
+import { ChatProvider } from '../../domain/chat/chatProvider';
+import Avatar from '../../components/avatar';
 
 export default function ChatListScreen({ navigation }: { navigation: any }) {
+    const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const sortedChats = chatsData.sort((a, b) => b.time.getTime() - a.time.getTime());
+    useEffect(() => {
+        loadOnlineUsers();
+    }, [])
+
+    async function loadOnlineUsers() {
+        const onlineUsers = await ChatProvider.getOnlineUsers();
+        setOnlineUsers(onlineUsers);
+    }
+    const sortedChats = chatsData.sort((a, b) => {
+        const timeA = a.time ? a.time.getTime() : new Date(0).getTime();
+        const timeB = b.time ? b.time.getTime() : new Date(0).getTime();
+        return timeB - timeA;
+    });
 
     function formatChatTime(date: Date) {
         if (isToday(date)) {
@@ -30,11 +45,11 @@ export default function ChatListScreen({ navigation }: { navigation: any }) {
             style={styles.chatItem}
             onPress={() => navigation.navigate('ChatDetail', { chatId: item.id })}
         >
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            <Avatar avatarUrl={item.user.avatar} username={item.user.userName} />
             <View style={styles.chatInfo}>
                 <View style={styles.chatHeader}>
-                    <Text style={styles.chatName}>{item.name}</Text>
-                    <Text style={styles.chatTime}>{formatChatTime(item.time)}</Text>
+                    <Text style={styles.chatName}>{item.user.name}</Text>
+                    {item.time != null && <Text style={styles.chatTime}>{formatChatTime(item.time)}</Text>}
                 </View>
                 <Text style={styles.lastMessage} numberOfLines={1}>
                     {item.isGroup && item.lastMessageSender ? `${item.lastMessageSender}: ` : ''}
@@ -44,29 +59,62 @@ export default function ChatListScreen({ navigation }: { navigation: any }) {
         </TouchableOpacity>
     );
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Contacts</Text>
+    const renderOnlineUser = ({ item }: { item: User }) => (
+        <TouchableOpacity
+            style={styles.onlineUserContainer}
+            onPress={() => navigation.navigate('ChatDetail', { userId: item.id })}
+        >
+            <View style={styles.onlineAvatarContainer} >
+                <Avatar username={item.userName} avatarUrl={item.avatar} style={styles.onlineAvatar} />
+                <View style={styles.onlineIndicator} />
             </View>
-            <View style={styles.searchInputContainer}>
-                <Icon name="search" size={14} color={colors.textPlaceholderColor} />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search"
-                />
-            </View>
+            <Text style={styles.onlineUserName}>{item.name}</Text>
+        </TouchableOpacity>
+    );
 
-            <FlatList
-                data={sortedChats}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={(a) => renderChatItem(a.item)}
-            />
-        </View>
+    return (
+        <FlatList
+            contentContainerStyle={{ backgroundColor: '#fff', }}
+            ListHeaderComponent={
+                <>
+                    <View style={styles.container}>
+                        <View style={styles.header}>
+                            <Text style={styles.headerText}>Contacts</Text>
+                        </View>
+
+                        <View style={styles.searchInputContainer}>
+                            <Icon name="search" size={14} color={colors.textPlaceholderColor} />
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search"
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                            />
+                        </View>
+
+                        <FlatList
+                            data={onlineUsers}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={renderOnlineUser}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.onlineUsersList}
+                        />
+                    </View>
+                </>
+            }
+            data={sortedChats}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => renderChatItem(item)}
+        />
     );
 }
 
 const styles = StyleSheet.create({
+    scrollViewContainer: {
+        flexGrow: 1,
+        paddingBottom: 20,
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',
@@ -84,11 +132,6 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomWidth: 0.5,
         borderBottomColor: '#f0f0f0',
-    },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
     },
     searchInputContainer: {
         flexDirection: 'row',
@@ -127,5 +170,34 @@ const styles = StyleSheet.create({
         color: '#808080',
         marginTop: 2,
         fontSize: 14
+    },
+    onlineUsersList: {
+        paddingVertical: 10,
+    },
+    onlineUserContainer: {
+        alignItems: 'center',
+        marginHorizontal: 8,
+    },
+    onlineAvatarContainer: {
+        position: 'relative'
+    },
+    onlineAvatar: {
+        position: 'relative'
+    },
+    onlineIndicator: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: '#34c949',
+        borderWidth: 2,
+        borderColor: '#fff',
+    },
+    onlineUserName: {
+        marginTop: 4,
+        fontSize: 12,
+        color: colors.textColor,
     },
 });

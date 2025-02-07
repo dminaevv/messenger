@@ -9,30 +9,30 @@ export default function AuthScreen({ navigation }: any) {
     return (
         <View style={styles.container}>
             <View>
-                <Text style={styles.title}>Вход</Text>
+                <Text style={styles.title}>Login</Text>
                 <Text style={styles.subtitle}>
-                    Для входа на платформу введите логин и пароль
+                    Enter your username and password to access the platform
                 </Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Ваш логин"
+                    placeholder="Your username"
                     value={login ?? ''}
                     onChangeText={setLogin}
                 />
                 <TextInput
                     style={styles.input}
-                    placeholder="Ваш пароль"
+                    placeholder="Your password"
                     value={password ?? ''}
                     onChangeText={setPassword}
                     secureTextEntry
                 />
                 <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
-                    <Text style={styles.recoveryText}>Регистрация</Text>
+                    <Text style={styles.recoveryText}>Sign Up</Text>
                 </TouchableOpacity>
             </View>
 
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
-                <Text style={styles.buttonText}>Войти</Text>
+                <Text style={styles.buttonText}>Log In</Text>
             </TouchableOpacity>
         </View>
     );
