@@ -11,7 +11,9 @@ export interface ChatItem {
 export interface User {
     id: string;
     name: string;
+    surname: string;
     userName: string;
+    mail: string;
     avatar: string | null;
 }
 
@@ -23,19 +25,19 @@ export interface Message {
 }
 
 export const users: User[] = [
-    { id: '1', userName: "test1", name: 'Emily Smith', avatar: null },
-    { id: '2', userName: "test2", name: 'Michael Brown', avatar: 'https://i.pravatar.cc/150?img=22' },
-    { id: '3', userName: "test3", name: 'Sophia Davis', avatar: 'https://i.pravatar.cc/150?img=23' },
-    { id: '4', userName: "test4", name: 'James Wilson', avatar: 'https://i.pravatar.cc/150?img=24' },
-    { id: '5', userName: "test5", name: 'Olivia Martinez', avatar: 'https://i.pravatar.cc/150?img=25' },
-    { id: '6', userName: "test6", name: 'Liam Johnson', avatar: 'https://i.pravatar.cc/150?img=26' },
-    { id: '7', userName: "test7", name: 'Ava White', avatar: 'https://i.pravatar.cc/150?img=27' },
-    { id: '8', userName: "test8", name: 'Isabella Harris', avatar: 'https://i.pravatar.cc/150?img=28' },
-    { id: '9', userName: "test9", name: 'Noah Clark', avatar: 'https://i.pravatar.cc/150?img=29' },
-    { id: '10', userName: "test10", name: 'Ethan Lewis', avatar: 'https://i.pravatar.cc/150?img=30' },
-    { id: '11', userName: "test11", name: 'Sophia White', avatar: 'https://i.pravatar.cc/150?img=31' },
-    { id: '12', userName: "test12", name: 'Benjamin Scott', avatar: 'https://i.pravatar.cc/150?img=32' },
-    { id: '13', userName: "test13", name: 'Ella Thompson', avatar: 'https://i.pravatar.cc/150?img=33' },
+    { id: '1', mail: "test@mail.ru", userName: "test1", name: 'Emily', surname: "Smith", avatar: null },
+    { id: '2', mail: "test@mail.ru", userName: "test2", name: 'Michael', surname: "Brown", avatar: 'https://i.pravatar.cc/150?img=22' },
+    { id: '3', mail: "test@mail.ru", userName: "test3", name: 'Sophia', surname: "Davis", avatar: 'https://i.pravatar.cc/150?img=23' },
+    { id: '4', mail: "test@mail.ru", userName: "test4", name: 'James', surname: "Wilson", avatar: 'https://i.pravatar.cc/150?img=24' },
+    { id: '5', mail: "test@mail.ru", userName: "test5", name: 'Olivia', surname: "Martinez", avatar: 'https://i.pravatar.cc/150?img=25' },
+    { id: '6', mail: "test@mail.ru", userName: "test6", name: 'Liam', surname: "Johnson", avatar: 'https://i.pravatar.cc/150?img=26' },
+    { id: '7', mail: "test@mail.ru", userName: "test7", name: 'Ava', surname: "White", avatar: 'https://i.pravatar.cc/150?img=27' },
+    { id: '8', mail: "test@mail.ru", userName: "test8", name: 'Isabella', surname: "Harris", avatar: 'https://i.pravatar.cc/150?img=28' },
+    { id: '9', mail: "test@mail.ru", userName: "test9", name: 'Noah', surname: "Clark", avatar: 'https://i.pravatar.cc/150?img=29' },
+    { id: '10', mail: "test@mail.ru", userName: "test10", name: 'Ethan', surname: "Lewis", avatar: 'https://i.pravatar.cc/150?img=30' },
+    { id: '11', mail: "test@mail.ru", userName: "test11", name: 'Sophia', surname: "White", avatar: 'https://i.pravatar.cc/150?img=31' },
+    { id: '12', mail: "test@mail.ru", userName: "test12", name: 'Benjamin', surname: "Scott", avatar: 'https://i.pravatar.cc/150?img=32' },
+    { id: '13', mail: "test@mail.ru", userName: "test13", name: 'Ella', surname: "Thompson", avatar: 'https://i.pravatar.cc/150?img=33' },
 ];
 
 

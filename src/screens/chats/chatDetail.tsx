@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TouchableOpacity, Image, Text, TextInput, StyleSheet, FlatList, Animated, Alert } from 'react-native';
+import { View, TouchableOpacity, Image, Text, TextInput, StyleSheet, FlatList, Animated, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../config/colors';
@@ -13,6 +13,8 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import FastImage from 'react-native-fast-image';
 import ChatPhotoModal from './chatPhoto';
 import Avatar from '../../components/avatar';
+import EmojiSelector, { Categories } from "react-native-emoji-selector";
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -35,6 +37,11 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
     const [allMedia, setAllMedia] = useState<string[]>([]);
 
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+    const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
+
+    const handleEmojiSelect = (emoji: string) => {
+        setMessageText((prevText) => (prevText || '') + emoji);
+    };
 
     useEffect(() => {
         const allMedia = messages.filter(m => m.mediaUris).flatMap(m => m.mediaUris);
@@ -381,19 +388,42 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                                     multiline
                                     numberOfLines={4}
                                 />
+
                             </View>
                         )
                 }
 
-                <TouchableOpacity
-                    style={styles.sendButton}
-                    onPress={messageText?.trim() ? handleSendMessage : undefined}
-                    onLongPress={!messageText?.trim() ? handleStartRecording : undefined}
-                    onPressOut={!messageText?.trim() ? handleStopRecording : undefined}
-                >
-                    <IoniconsIcon name={messageText?.trim() ? "send" : "mic"} size={15} color="#ffffff" />
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => setIsEmojiPickerVisible(!isEmojiPickerVisible)}>
+                        <IoniconsIcon name="happy-outline" size={25} color={colors.darkPrimary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.sendButton}
+                        onPress={messageText?.trim() ? handleSendMessage : undefined}
+                        onLongPress={!messageText?.trim() ? handleStartRecording : undefined}
+                        onPressOut={!messageText?.trim() ? handleStopRecording : undefined}
+                    >
+                        <IoniconsIcon name={messageText?.trim() ? "send" : "mic"} size={15} color="#ffffff" />
+                    </TouchableOpacity>
+                </View>
             </View>
+            <KeyboardAvoidingView
+                behavior={Platform.select({ android: undefined, ios: 'padding' })}
+            >
+                {
+                    isEmojiPickerVisible && (
+                        <EmojiSelector
+                            category={Categories.symbols}
+                            onEmojiSelected={handleEmojiSelect}
+                            columns={8}
+                            showSearchBar
+                            showTabs
+                            showHistory
+                            showSectionTitles
+                        />
+                    )
+                }
+            </KeyboardAvoidingView >
         </View>
     );
 }
@@ -405,23 +435,23 @@ const styles = StyleSheet.create({
     },
     headerLeft: {
         flexDirection: 'row',
-        alignItems: "center",
-        gap: 20
+        alignItems: 'center',
+        gap: moderateScale(20),
     },
     recordingContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 8,
-        borderRadius: 10,
-        height: 40
+        padding: moderateScale(8),
+        borderRadius: moderateScale(10),
+        height: verticalScale(40),
     },
     recordingDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
+        width: moderateScale(10),
+        height: moderateScale(10),
+        borderRadius: moderateScale(5),
         backgroundColor: 'red',
-        marginRight: 8,
+        marginRight: moderateScale(8),
     },
     recordingText: {
         color: colors.textColor,
@@ -430,9 +460,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderBottomWidth: 1,
+        paddingHorizontal: scale(10),
+        paddingVertical: verticalScale(5),
+        borderBottomWidth: moderateScale(1),
         borderBottomColor: '#f0f0f0',
         backgroundColor: '#f9f9f9',
     },
@@ -444,48 +474,48 @@ const styles = StyleSheet.create({
     headerInfoContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10
+        gap: moderateScale(10),
     },
     headerActionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10
+        gap: moderateScale(10),
     },
     headerName: {
         textAlign: 'center',
         fontWeight: '500',
-        fontSize: 14,
+        fontSize: moderateScale(14),
     },
     messagesContainer: {
-        paddingHorizontal: 10,
+        paddingHorizontal: scale(10),
     },
     inputContainer: {
         flexDirection: 'row',
-        paddingHorizontal: 10,
-        paddingVertical: 10,
+        paddingHorizontal: scale(10),
+        paddingVertical: verticalScale(10),
         alignItems: 'center',
     },
     textInput: {
         flex: 1,
-        borderRadius: 20,
-        padding: 10,
+        borderRadius: moderateScale(20),
+        padding: moderateScale(10),
         backgroundColor: '#f2f2f2',
         color: colors.textColor,
-        height: 40
+        height: verticalScale(40),
     },
     sendButton: {
         backgroundColor: colors.primary,
-        width: 35,
-        height: 35,
-        borderRadius: 20,
+        width: moderateScale(35),
+        height: moderateScale(35),
+        borderRadius: moderateScale(20),
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 10,
+        marginLeft: scale(10),
     },
     messageContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginVertical: 5,
+        marginVertical: verticalScale(5),
     },
     myMessageContainer: {
         justifyContent: 'flex-end',
@@ -494,19 +524,19 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     avatar: {
-        marginRight: 10,
+        marginRight: scale(10),
     },
     messageContent: {
         maxWidth: '80%',
     },
     senderName: {
-        fontSize: 12,
+        fontSize: moderateScale(12),
         color: '#555',
-        marginBottom: 2,
+        marginBottom: verticalScale(2),
     },
     messageBubble: {
-        padding: 10,
-        borderRadius: 18,
+        padding: moderateScale(10),
+        borderRadius: moderateScale(18),
     },
     myMessage: {
         backgroundColor: colors.primary,
@@ -527,19 +557,19 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     attachButton: {
-        marginRight: 10,
+        marginRight: scale(10),
     },
     mediaGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 5,
+        gap: moderateScale(5),
         justifyContent: 'flex-end',
     },
     mediaThumbnail: {
-        width: 100,
-        height: 100,
-        borderRadius: 8,
-        backgroundColor: "#f0f0f0",
+        width: moderateScale(100),
+        height: moderateScale(100),
+        borderRadius: moderateScale(8),
+        backgroundColor: '#f0f0f0',
     },
 });
 

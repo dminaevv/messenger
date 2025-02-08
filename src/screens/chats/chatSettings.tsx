@@ -5,7 +5,7 @@ import { colors } from '../../config/colors';
 import { ChatItem } from '../../config/data';
 import { ChatProvider } from '../../domain/chat/chatProvider';
 import Avatar from '../../components/avatar';
-import { BlurView } from '@react-native-community/blur';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 const { width, height } = Dimensions.get('window');
 
@@ -107,82 +107,82 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: '#f2f2f2',
-        padding: 10,
+        padding: scale(10),
     },
     headerContainer: {
-        position: 'relative'
+        position: 'relative',
     },
     backButton: {
-        borderRadius: 20,
+        borderRadius: moderateScale(20),
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10
+        marginBottom: verticalScale(10),
     },
     backButtonText: {
-        marginLeft: 5,
-        fontSize: 18
+        marginLeft: scale(5),
+        color: colors.darkPrimary,
+        fontSize: moderateScale(18),
     },
     card: {
         backgroundColor: '#fff',
-        borderRadius: 8,
-        marginVertical: 10,
-        padding: 15,
+        borderRadius: moderateScale(8),
+        marginVertical: verticalScale(10),
+        padding: moderateScale(15),
     },
     cardTitle: {
-        fontSize: 18,
+        fontSize: moderateScale(18),
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: verticalScale(10),
         color: '#333',
     },
     optionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: verticalScale(10),
     },
     icon: {
-        marginRight: 15,
+        marginRight: scale(15),
     },
     optionText: {
-        fontSize: 16,
+        fontSize: moderateScale(16),
         color: '#333',
     },
     imageContainer: {
-        width: width - 20,
+        width: width - scale(20),
         height: height * 0.4,
-        objectFit: 'cover',
-        borderRadius: 12,
+        borderRadius: moderateScale(12),
     },
     avatarContainer: {
-        width: width - 20,
+        width: width - scale(20),
         position: 'relative',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10
+        marginBottom: verticalScale(10),
     },
     name: {
-        marginTop: 10,
-        fontSize: 26,
-        fontWeight: 600,
+        marginTop: verticalScale(10),
+        fontSize: moderateScale(26),
+        fontWeight: '600',
     },
     nameText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: moderateScale(18),
         fontWeight: '600',
     },
     overlayContainer: {
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        padding: 15,
+        padding: moderateScale(15),
         alignItems: 'center',
     },
     blurView: {
-        width: width - 20,
+        width: width - scale(20),
         height: (height * 0.4) * 0.15,
-        position: 'absolute'
+        position: 'absolute',
     },
     username: {
-        fontSize: 18,
+        fontSize: moderateScale(18),
         fontWeight: 'bold',
         color: 'white',
         zIndex: 1,

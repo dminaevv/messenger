@@ -7,6 +7,7 @@ import { colors } from '../../config/colors';
 import { ChatItem, chatsData, User } from '../../config/data';
 import { ChatProvider } from '../../domain/chat/chatProvider';
 import Avatar from '../../components/avatar';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 export default function ChatListScreen({ navigation }: { navigation: any }) {
     const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
@@ -110,48 +111,47 @@ export default function ChatListScreen({ navigation }: { navigation: any }) {
     );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     scrollViewContainer: {
         flexGrow: 1,
-        paddingBottom: 20,
+        paddingBottom: verticalScale(20),
     },
     container: {
         flex: 1,
         backgroundColor: '#fff',
     },
     header: {
-        padding: 16,
+        padding: moderateScale(16),
     },
     headerText: {
-        fontSize: 18,
+        fontSize: moderateScale(18),
         fontWeight: 'bold',
-        color: colors.textColor
+        color: colors.textColor,
     },
     chatItem: {
         flexDirection: 'row',
-        padding: 10,
+        padding: moderateScale(10),
         borderBottomWidth: 0.5,
         borderBottomColor: '#f0f0f0',
     },
     searchInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 10,
-        marginBottom: 10,
-        borderRadius: 18,
+        marginHorizontal: scale(10),
+        marginBottom: verticalScale(10),
+        borderRadius: moderateScale(18),
         backgroundColor: '#f2f2f2',
-        paddingHorizontal: 10,
-        height: 40,
-
+        paddingHorizontal: scale(10),
+        height: verticalScale(35),
     },
     searchInput: {
         flex: 1,
-        marginLeft: 5,
-        color: colors.textColor
+        marginLeft: scale(5),
+        color: colors.textColor,
     },
     chatInfo: {
         flex: 1,
-        marginLeft: 10,
+        marginLeft: scale(10),
         justifyContent: 'center',
     },
     chatHeader: {
@@ -160,44 +160,44 @@ const styles = StyleSheet.create({
     },
     chatName: {
         fontWeight: '500',
-        fontSize: 17,
+        fontSize: moderateScale(17),
     },
     chatTime: {
         color: '#808080',
-        fontSize: 12,
+        fontSize: moderateScale(12),
     },
     lastMessage: {
         color: '#808080',
-        marginTop: 2,
-        fontSize: 14
+        marginTop: verticalScale(2),
+        fontSize: moderateScale(14),
     },
     onlineUsersList: {
-        paddingVertical: 10,
+        paddingVertical: verticalScale(10),
     },
     onlineUserContainer: {
         alignItems: 'center',
-        marginHorizontal: 8,
+        marginHorizontal: scale(8),
     },
     onlineAvatarContainer: {
-        position: 'relative'
+        position: 'relative',
     },
     onlineAvatar: {
-        position: 'relative'
+        position: 'relative',
     },
     onlineIndicator: {
         position: 'absolute',
         bottom: 0,
         right: 0,
-        width: 14,
-        height: 14,
-        borderRadius: 7,
+        width: moderateScale(14),
+        height: moderateScale(14),
+        borderRadius: moderateScale(7),
         backgroundColor: '#34c949',
-        borderWidth: 2,
+        borderWidth: moderateScale(2),
         borderColor: '#fff',
     },
     onlineUserName: {
-        marginTop: 4,
-        fontSize: 12,
+        marginTop: verticalScale(4),
+        fontSize: moderateScale(12),
         color: colors.textColor,
     },
 });

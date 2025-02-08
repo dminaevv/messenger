@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import ChatListScreen from './src/screens/chats/chatList';
 import SettingsScreen from './src/screens/settings/settings';
 import ChatDetailScreen from './src/screens/chats/chatDetail';
@@ -14,6 +13,7 @@ import RegistrationScreen from './src/screens/register/register';
 import { colors } from './src/config/colors';
 import ChatSettingsScreen from './src/screens/chats/chatSettings';
 import { MenuProvider } from 'react-native-popup-menu';
+import { moderateScale } from 'react-native-size-matters';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,7 +22,7 @@ function MainTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarStyle: { height: 50 },
+        tabBarStyle: { height: moderateScale(50) },
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: colors.black,
         tabBarInactiveTintColor: colors.gray,
@@ -77,12 +77,12 @@ export default function App() {
               <Stack.Screen
                 name="ChatDetail"
                 component={ChatDetailScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false, gestureEnabled: true }}
               />
               <Stack.Screen
                 name="ChatSettings"
                 component={ChatSettingsScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false, gestureEnabled: true }}
               />
             </Stack.Navigator>
           </NavigationContainer>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View, TextInput, StyleSheet } from 'react-native';
 import { colors } from '../../config/colors';
+import { moderateScale, scale, ScaledSheet, verticalScale } from 'react-native-size-matters';
 
 export default function AuthScreen({ navigation }: any) {
     const [login, setLogin] = useState<string | null>(null);
@@ -38,50 +39,50 @@ export default function AuthScreen({ navigation }: any) {
     );
 }
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        padding: 16,
+        padding: moderateScale(16),
         flexDirection: 'column',
         justifyContent: 'space-between',
     },
     title: {
-        fontSize: 32,
-        marginBottom: 8,
+        fontSize: scale(32),
+        marginBottom: verticalScale(8),
         fontWeight: 'bold',
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: scale(16),
         color: '#666',
-        marginBottom: 16,
+        marginBottom: verticalScale(16),
     },
     input: {
         width: '100%',
-        height: 50,
+        height: verticalScale(50),
         borderColor: '#ccc',
         borderWidth: 1,
-        borderRadius: 18,
-        paddingHorizontal: 16,
-        marginBottom: 16,
-        fontSize: 16,
+        borderRadius: moderateScale(18),
+        paddingHorizontal: moderateScale(16),
+        marginBottom: verticalScale(16),
+        fontSize: scale(16),
     },
     recoveryText: {
-        fontSize: 14,
+        fontSize: scale(14),
         color: colors.primary,
         textAlign: 'right',
     },
     button: {
         width: '100%',
-        height: 50,
+        height: verticalScale(50),
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 18,
+        borderRadius: moderateScale(18),
     },
     buttonText: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: scale(16),
         fontWeight: 'bold',
     },
 });

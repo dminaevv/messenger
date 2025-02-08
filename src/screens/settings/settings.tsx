@@ -8,10 +8,19 @@ import {
     TextInput,
 } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import Avatar from '../../components/avatar';
+import { useAppContext } from '../../contexts/appContext';
+import { colors } from '../../config/colors';
 
 export default function SettingsScreen() {
-    const [avatar, setAvatar] = useState<string | null>(null);
-    const [username, setUsername] = useState<string>('User123');
+    const { user } = useAppContext()
+    const [avatar, setAvatar] = useState<string | null>(user?.avatar ?? null);
+
+    const [name, setName] = useState<string>(user?.name ?? "");
+    const [surname, setSurname] = useState<string>(user?.surname ?? "");
+    const [username, setUsername] = useState<string>(user?.userName ?? "");
+    const [mail, setMail] = useState<string>(user?.mail ?? "");
 
     const selectAvatar = () => {
         ImagePicker.launchImageLibrary(
@@ -29,62 +38,100 @@ export default function SettingsScreen() {
     return (
         <View style={styles.screen}>
             <TouchableOpacity style={styles.avatarContainer} onPress={selectAvatar}>
-                <Image
-                    source={avatar ? { uri: avatar } : require('../../assets/img/default_avatar.jpg')}
-                    style={styles.avatar}
+                <Avatar
+                    avatarUrl={avatar}
+                    username={user!.userName}
+                    size={scale(100)}
                 />
                 <Text style={styles.changeAvatarText}>Change Avatar</Text>
             </TouchableOpacity>
 
             <View style={styles.card}>
-                <Text style={styles.label}>Username:</Text>
                 <TextInput
                     style={styles.input}
-                    value={username}
-                    onChangeText={setUsername}
-                    placeholder="Enter your username"
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Name"
                 />
+                <TextInput
+                    style={styles.input}
+                    value={surname}
+                    onChangeText={setSurname}
+                    placeholder="surname"
+                />
+            </View>
+            <Text style={[styles.subtitle, { marginBottom: 30 }]}>Enter a name and, if you want, add a photo to your profile.</Text>
+
+            <View style={styles.card}>
+                <View style={styles.cardRow}>
+                    <Text style={styles.cardRowText}>Mail</Text>
+                    <TextInput
+                        style={[styles.input, styles.rightInput]}
+                        value={mail}
+                        onChangeText={setMail}
+                        placeholder="Enter your mail"
+                    />
+                </View>
+                <View style={styles.cardRow}>
+                    <Text style={styles.cardRowText}>Username</Text>
+                    <TextInput
+                        style={[styles.input, styles.rightInput]}
+                        value={username}
+                        onChangeText={setUsername}
+                        placeholder="Enter your username"
+                    />
+                </View>
             </View>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     screen: {
         flex: 1,
-        padding: 20,
+        padding: moderateScale(20),
     },
     avatarContainer: {
         alignItems: 'center',
-        marginVertical: 20,
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#d3d3d3',
+        marginTop: verticalScale(20),
+        marginBottom: verticalScale(5),
     },
     changeAvatarText: {
         color: '#007AFF',
-        marginTop: 8,
+        fontSize: scale(16),
+        marginTop: verticalScale(4),
+    },
+    subtitle: {
+        marginLeft: scale(20),
+        marginTop: verticalScale(5),
+        color: colors.gray
     },
     card: {
         backgroundColor: '#ffffff',
-        padding: 15,
-        borderRadius: 12,
-        marginVertical: 10,
+        padding: moderateScale(10),
+        borderRadius: moderateScale(12),
+        marginTop: verticalScale(10),
+    },
+    cardRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: scale(10),
+    },
+    cardRowText: {
+        fontSize: moderateScale(16),
     },
     label: {
-        fontSize: 16,
+        fontSize: moderateScale(16),
         color: '#333',
     },
     input: {
-        marginTop: 5,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        fontSize: 16,
+        borderRadius: moderateScale(8),
+        paddingHorizontal: scale(10),
+        paddingVertical: verticalScale(8),
+        fontSize: moderateScale(16),
     },
+    rightInput: {
+        textAlign: 'right',
+        flex: 1
+    }
 });

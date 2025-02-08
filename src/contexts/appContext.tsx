@@ -20,7 +20,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const [theme, setTheme] = useState<string>('light');
 
     useEffect(() => {
-        setUser({ id: '0', name: 'Alexey Ivanov', avatar: 'https://i.pravatar.cc/150?img=8' })
+        setUser({ id: '0', name: 'Alexey', surname: "Ivanov", avatar: 'https://i.pravatar.cc/150?img=8', userName: 'test222', mail: 'test@mail.ru' })
     }, [])
 
 
