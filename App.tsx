@@ -77,7 +77,7 @@ export default function App() {
               <Stack.Screen
                 name="ChatDetail"
                 component={ChatDetailScreen}
-                options={{ headerShown: false, gestureEnabled: true }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="ChatSettings"

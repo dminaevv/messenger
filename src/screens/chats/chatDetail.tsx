@@ -13,7 +13,6 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import FastImage from 'react-native-fast-image';
 import ChatPhotoModal from './chatPhoto';
 import Avatar from '../../components/avatar';
-import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
@@ -394,7 +393,7 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                 }
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => setIsEmojiPickerVisible(!isEmojiPickerVisible)}>
+                    <TouchableOpacity onPress={() => setIsEmojiPickerVisible(prev => !prev)}>
                         <IoniconsIcon name="happy-outline" size={25} color={colors.darkPrimary} />
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -407,23 +406,9 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                     </TouchableOpacity>
                 </View>
             </View>
-            <KeyboardAvoidingView
-                behavior={Platform.select({ android: undefined, ios: 'padding' })}
-            >
-                {
-                    isEmojiPickerVisible && (
-                        <EmojiSelector
-                            category={Categories.symbols}
-                            onEmojiSelected={handleEmojiSelect}
-                            columns={8}
-                            showSearchBar
-                            showTabs
-                            showHistory
-                            showSectionTitles
-                        />
-                    )
-                }
-            </KeyboardAvoidingView >
+            {/* <EmojiBoard
+                showBoard onClick={() => { }}
+            /> */}
         </View>
     );
 }
@@ -501,7 +486,8 @@ const styles = StyleSheet.create({
         padding: moderateScale(10),
         backgroundColor: '#f2f2f2',
         color: colors.textColor,
-        height: verticalScale(40),
+        height: 40,
+        marginRight: 5,
     },
     sendButton: {
         backgroundColor: colors.primary,
