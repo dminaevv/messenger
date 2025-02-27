@@ -1,44 +1,118 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { User } from '../config/data';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useMemo } from 'react';
+import { darkColors, lightColors } from '../config/colors';
+import { mapToUser, User } from '../domain/user/user';
+import { AuthProvider } from '../domain/auth/authProvider';
+import useWebSocket from '../hooks/useWebSocket';
 
-interface AppContextProps {
-    user: User | null;
-    setUser: (user: User | null) => void;
+interface IAppContextPropsBase {
     theme: string;
     setTheme: (theme: string) => void;
+    colors: typeof lightColors;
+    logout: () => void;
+    login: (user: User, token: string) => void;
 }
 
+interface IAppContextPropsAuth extends IAppContextPropsBase {
+    user: User;
+    isAuth: true;
+    token: string;
+}
 
-const AppContext = createContext<AppContextProps | undefined>(undefined);
+interface IAppContextPropsNotAuth extends IAppContextPropsBase {
+    user: User | null;
+    isAuth: false | null;
+    token: null;
+}
 
-interface AppProviderProps {
+type IAppContextProps = IAppContextPropsAuth | IAppContextPropsNotAuth;
+
+const AppContext = createContext<IAppContextProps | undefined>(undefined);
+
+interface IAppProviderProps {
     children: ReactNode;
 }
 
-export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+export function AppProvider(props: IAppProviderProps) {
     const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+    const [isAuth, setIsAuth] = useState<boolean | null>(null);
     const [theme, setTheme] = useState<string>('light');
+    const colors = useMemo(() => (theme === 'light' ? lightColors : darkColors), [theme]);
+
+    const webSocket = useWebSocket({ userId: isAuth && user ? user.id : null, token });
 
     useEffect(() => {
-        setUser({ id: '0', name: 'Alexey', surname: "Ivanov", avatar: 'https://i.pravatar.cc/150?img=8', userName: 'test222', mail: 'test@mail.ru' })
-    }, [])
+        loadTheme();
+        checkSession();
+    }, []);
 
+    useEffect(() => {
+        saveTheme(theme);
+    }, [theme]);
+
+    async function checkSession() {
+        const token = await AsyncStorage.getItem('session');
+        if (token) {
+            const response = await AuthProvider.me(token);
+            login(mapToUser(response.data), token);
+        }
+        else {
+            logout();
+        }
+    }
+
+    async function loadTheme() {
+        try {
+            const storedTheme = await AsyncStorage.getItem('theme');
+            if (storedTheme) setTheme(storedTheme);
+        } catch (e) {
+            console.error('Ошибка загрузки темы:', e);
+        }
+    };
+
+    async function saveTheme(theme: string) {
+        try {
+            await AsyncStorage.setItem('theme', theme);
+        } catch (e) {
+            console.error('Ошибка сохранения темы:', e);
+        }
+    };
+
+    function login(user: User, token: string | null = null) {
+        setUser(user);
+        setIsAuth(true);
+        if (token) {
+            setToken(token);
+            AsyncStorage.setItem("session", token);
+        }
+    }
+
+    async function logout() {
+        setIsAuth(false);
+        setToken(null);
+        await AsyncStorage.removeItem('session');
+    }
 
     return (
         <AppContext.Provider
             value={{
                 user,
-                setUser,
+                token: isAuth ? (token as string) : null,
                 theme,
-                setTheme
-            }}
+                setTheme,
+                colors,
+                isAuth,
+                login,
+                logout
+            } as IAppContextProps}
         >
-            {children}
+            {props.children}
         </AppContext.Provider>
     );
 };
 
-export const useAppContext = (): AppContextProps => {
+export const useAppContext = (): IAppContextProps => {
     const context = useContext(AppContext);
     if (!context) {
         throw new Error('useAppContext must be used within an AppProvider');

@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
-    Image,
     TextInput,
+    Switch,
 } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Avatar from '../../components/avatar';
 import { useAppContext } from '../../contexts/appContext';
-import { colors } from '../../config/colors';
+import ConfirmModal from '../../components/confirmModal';
 
 export default function SettingsScreen() {
-    const { user } = useAppContext()
+    const { user, colors, theme, setTheme, logout } = useAppContext();
     const [avatar, setAvatar] = useState<string | null>(user?.avatar ?? null);
+    const [name, setName] = useState<string>(user?.first_name ?? "");
+    const [surname, setSurname] = useState<string>(user?.last_name ?? "");
+    const [username, setUsername] = useState<string>(user?.username ?? "");
+    const [mail, setMail] = useState<string>(user?.email ?? "");
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
-    const [name, setName] = useState<string>(user?.name ?? "");
-    const [surname, setSurname] = useState<string>(user?.surname ?? "");
-    const [username, setUsername] = useState<string>(user?.userName ?? "");
-    const [mail, setMail] = useState<string>(user?.mail ?? "");
-
-    const selectAvatar = () => {
+    function selectAvatar() {
         ImagePicker.launchImageLibrary(
             {
                 mediaType: 'photo',
@@ -35,53 +35,100 @@ export default function SettingsScreen() {
         );
     };
 
+    function toggleTheme() {
+        setTheme(theme === 'light' ? 'dark' : 'light');
+    };
+
+    function handleLogout() {
+        setIsConfirmVisible(true);
+    };
+
+    function confirmLogout() {
+        setIsConfirmVisible(false);
+        logout();
+    };
+
     return (
-        <View style={styles.screen}>
+        <View style={[styles.screen, { backgroundColor: colors.background }]}>
+            <ConfirmModal
+                title='Are you sure?'
+                message='Do you really want to log out?'
+                visible={isConfirmVisible}
+                onConfirm={confirmLogout}
+                onCancel={() => setIsConfirmVisible(false)}
+            />
             <TouchableOpacity style={styles.avatarContainer} onPress={selectAvatar}>
                 <Avatar
                     avatarUrl={avatar}
-                    username={user!.userName}
+                    username={user!.username}
                     size={scale(100)}
                 />
-                <Text style={styles.changeAvatarText}>Change Avatar</Text>
+                <Text style={[styles.changeAvatarText, { color: colors.primary }]}>
+                    Change Avatar
+                </Text>
             </TouchableOpacity>
 
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: colors.inputBackgroundColor }]}>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: colors.text }]}
                     value={name}
                     onChangeText={setName}
                     placeholder="Name"
+                    placeholderTextColor={colors.textPlaceholderColor}
                 />
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: colors.text }]}
                     value={surname}
                     onChangeText={setSurname}
-                    placeholder="surname"
+                    placeholder="Surname"
+                    placeholderTextColor={colors.textPlaceholderColor}
                 />
             </View>
-            <Text style={[styles.subtitle, { marginBottom: 30 }]}>Enter a name and, if you want, add a photo to your profile.</Text>
 
-            <View style={styles.card}>
+            <Text style={[styles.subtitle, { color: colors.gray, marginBottom: 30 }]}>
+                Enter a name and, if you want, add a photo to your profile.
+            </Text>
+
+            <View style={[styles.card, { backgroundColor: colors.inputBackgroundColor }]}>
                 <View style={styles.cardRow}>
-                    <Text style={styles.cardRowText}>Mail</Text>
+                    <Text style={[styles.cardRowText, { color: colors.text }]}>Mail</Text>
                     <TextInput
-                        style={[styles.input, styles.rightInput]}
+                        style={[styles.input, styles.rightInput, { color: colors.text }]}
                         value={mail}
                         onChangeText={setMail}
                         placeholder="Enter your mail"
+                        placeholderTextColor={colors.textPlaceholderColor}
                     />
                 </View>
                 <View style={styles.cardRow}>
-                    <Text style={styles.cardRowText}>Username</Text>
+                    <Text style={[styles.cardRowText, { color: colors.text }]}>Username</Text>
                     <TextInput
-                        style={[styles.input, styles.rightInput]}
+                        style={[styles.input, styles.rightInput, { color: colors.text }]}
                         value={username}
                         onChangeText={setUsername}
                         placeholder="Enter your username"
+                        placeholderTextColor={colors.textPlaceholderColor}
                     />
                 </View>
             </View>
+
+            <View style={[styles.card, { backgroundColor: colors.inputBackgroundColor }]}>
+                <View style={styles.cardRow}>
+                    <Text style={[styles.cardRowText, { color: colors.text }]}>
+                        Theme: {theme === 'light' ? 'Light' : 'Dark'}
+                    </Text>
+                    <Switch
+                        value={theme === 'dark'}
+                        onValueChange={toggleTheme}
+                        thumbColor={colors.primary}
+                        trackColor={{ false: colors.gray, true: colors.primary }}
+                    />
+                </View>
+            </View>
+
+            <TouchableOpacity style={[styles.logoutButton, { backgroundColor: colors.primary }]} onPress={handleLogout}>
+                <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -97,17 +144,14 @@ export const styles = StyleSheet.create({
         marginBottom: verticalScale(5),
     },
     changeAvatarText: {
-        color: '#007AFF',
         fontSize: scale(16),
         marginTop: verticalScale(4),
     },
     subtitle: {
         marginLeft: scale(20),
         marginTop: verticalScale(5),
-        color: colors.gray
     },
     card: {
-        backgroundColor: '#ffffff',
         padding: moderateScale(10),
         borderRadius: moderateScale(12),
         marginTop: verticalScale(10),
@@ -115,14 +159,11 @@ export const styles = StyleSheet.create({
     cardRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: scale(10),
     },
     cardRowText: {
         fontSize: moderateScale(16),
-    },
-    label: {
-        fontSize: moderateScale(16),
-        color: '#333',
     },
     input: {
         borderRadius: moderateScale(8),
@@ -132,6 +173,17 @@ export const styles = StyleSheet.create({
     },
     rightInput: {
         textAlign: 'right',
-        flex: 1
-    }
+        flex: 1,
+    },
+    logoutButton: {
+        marginTop: verticalScale(20),
+        paddingVertical: verticalScale(12),
+        borderRadius: moderateScale(8),
+        alignItems: 'center',
+    },
+    logoutButtonText: {
+        color: 'white',
+        fontSize: moderateScale(16),
+        fontWeight: 'bold',
+    },
 });

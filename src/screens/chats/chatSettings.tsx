@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Image, Dimensions, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { colors } from '../../config/colors';
 import { ChatItem } from '../../config/data';
 import { ChatProvider } from '../../domain/chat/chatProvider';
 import Avatar from '../../components/avatar';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useAppContext } from '../../contexts/appContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function ChatSettingsScreen({ route, navigation }: { route: any, navigation: any }) {
     const { chatId, userId } = route.params;
     const [chat, setChat] = useState<ChatItem | null>(null);
+    const { colors } = useAppContext();
 
     useEffect(() => {
         loadChat();
@@ -23,12 +24,12 @@ export default function ChatSettingsScreen({ route, navigation }: { route: any, 
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}>
             {chat && <>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                         <Icon name="angle-left" size={35} color={colors.darkPrimary} />
-                        <Text style={styles.backButtonText}>Back</Text>
+                        <Text style={[styles.backButtonText, { color: colors.darkPrimary }]}>Back</Text>
                     </TouchableOpacity>
                     {
                         chat.user.avatar ? (
@@ -40,61 +41,61 @@ export default function ChatSettingsScreen({ route, navigation }: { route: any, 
                         )
                             : (
                                 <View style={styles.avatarContainer}>
-                                    <Avatar username={chat.user.userName} size={width * 0.33} />
-                                    <Text style={styles.name}>{chat.user.name ?? chat.user.userName}</Text>
+                                    <Avatar username={chat.user.username} size={width * 0.33} />
+                                    <Text style={styles.name}>{chat.user.first_name ?? chat.user.username}</Text>
                                 </View>
                             )
                     }
                 </View>
 
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>User Settings</Text>
+                <View style={[styles.card, { backgroundColor: colors.inputBackgroundColor }]}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>User Settings</Text>
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Theme')}>
-                        <Icon name="paint-brush" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Theme</Text>
+                        <Icon name="paint-brush" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Theme</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Quick Reaction')}>
-                        <Icon name="smile-o" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Quick Reaction</Text>
+                        <Icon name="smile-o" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Quick Reaction</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Nicknames')}>
-                        <Icon name="user" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Nicknames</Text>
+                        <Icon name="user" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Nicknames</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Other Settings</Text>
+                <View style={[styles.card, { backgroundColor: colors.inputBackgroundColor }]}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>Other Settings</Text>
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Create Group Chat')}>
-                        <Icon name="users" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Create Group Chat</Text>
+                        <Icon name="users" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Create Group Chat</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Media, Files, and Links')}>
-                        <Icon name="file" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Media, Files, and Links</Text>
+                        <Icon name="file" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Media, Files, and Links</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Search in Conversation')}>
-                        <Icon name="search" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Search in Conversation</Text>
+                        <Icon name="search" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Search in Conversation</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Delete Conversation')}>
-                        <Icon name="trash" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Delete Conversation</Text>
+                        <Icon name="trash" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Delete Conversation</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Block Contact')}>
-                        <Icon name="ban" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Block Contact</Text>
+                        <Icon name="ban" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Block Contact</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.optionButton} onPress={() => Alert.alert('Notifications')}>
-                        <Icon name="bell" size={20} color="#333" style={styles.icon} />
-                        <Text style={styles.optionText}>Notifications</Text>
+                        <Icon name="bell" size={20} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.optionText, { color: colors.text }]}>Notifications</Text>
                     </TouchableOpacity>
                 </View>
             </>
@@ -120,11 +121,9 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         marginLeft: scale(5),
-        color: colors.darkPrimary,
         fontSize: moderateScale(18),
     },
     card: {
-        backgroundColor: '#fff',
         borderRadius: moderateScale(8),
         marginVertical: verticalScale(10),
         padding: moderateScale(15),
@@ -133,7 +132,6 @@ const styles = StyleSheet.create({
         fontSize: moderateScale(18),
         fontWeight: 'bold',
         marginBottom: verticalScale(10),
-        color: '#333',
     },
     optionButton: {
         flexDirection: 'row',
@@ -145,7 +143,6 @@ const styles = StyleSheet.create({
     },
     optionText: {
         fontSize: moderateScale(16),
-        color: '#333',
     },
     imageContainer: {
         width: width - scale(20),

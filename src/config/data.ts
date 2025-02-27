@@ -1,3 +1,4 @@
+import { User } from "../domain/user/user";
 
 export interface ChatItem {
     id: number;
@@ -8,15 +9,6 @@ export interface ChatItem {
     lastMessageSender?: string;
 }
 
-export interface User {
-    id: string;
-    name: string;
-    surname: string;
-    userName: string;
-    mail: string;
-    avatar: string | null;
-}
-
 export interface Message {
     id: string;
     text: string;
@@ -25,19 +17,19 @@ export interface Message {
 }
 
 export const users: User[] = [
-    { id: '1', mail: "test@mail.ru", userName: "test1", name: 'Emily', surname: "Smith", avatar: null },
-    { id: '2', mail: "test@mail.ru", userName: "test2", name: 'Michael', surname: "Brown", avatar: 'https://i.pravatar.cc/150?img=22' },
-    { id: '3', mail: "test@mail.ru", userName: "test3", name: 'Sophia', surname: "Davis", avatar: 'https://i.pravatar.cc/150?img=23' },
-    { id: '4', mail: "test@mail.ru", userName: "test4", name: 'James', surname: "Wilson", avatar: 'https://i.pravatar.cc/150?img=24' },
-    { id: '5', mail: "test@mail.ru", userName: "test5", name: 'Olivia', surname: "Martinez", avatar: 'https://i.pravatar.cc/150?img=25' },
-    { id: '6', mail: "test@mail.ru", userName: "test6", name: 'Liam', surname: "Johnson", avatar: 'https://i.pravatar.cc/150?img=26' },
-    { id: '7', mail: "test@mail.ru", userName: "test7", name: 'Ava', surname: "White", avatar: 'https://i.pravatar.cc/150?img=27' },
-    { id: '8', mail: "test@mail.ru", userName: "test8", name: 'Isabella', surname: "Harris", avatar: 'https://i.pravatar.cc/150?img=28' },
-    { id: '9', mail: "test@mail.ru", userName: "test9", name: 'Noah', surname: "Clark", avatar: 'https://i.pravatar.cc/150?img=29' },
-    { id: '10', mail: "test@mail.ru", userName: "test10", name: 'Ethan', surname: "Lewis", avatar: 'https://i.pravatar.cc/150?img=30' },
-    { id: '11', mail: "test@mail.ru", userName: "test11", name: 'Sophia', surname: "White", avatar: 'https://i.pravatar.cc/150?img=31' },
-    { id: '12', mail: "test@mail.ru", userName: "test12", name: 'Benjamin', surname: "Scott", avatar: 'https://i.pravatar.cc/150?img=32' },
-    { id: '13', mail: "test@mail.ru", userName: "test13", name: 'Ella', surname: "Thompson", avatar: 'https://i.pravatar.cc/150?img=33' },
+    { id: 1, email: "test@mail.ru", username: "test1", first_name: 'Emily', last_name: "Smith", avatar: null },
+    { id: 2, email: "test@mail.ru", username: "test2", first_name: 'Michael', last_name: "Brown", avatar: 'https://i.pravatar.cc/150?img=22' },
+    { id: 3, email: "test@mail.ru", username: "test3", first_name: 'Sophia', last_name: "Davis", avatar: 'https://i.pravatar.cc/150?img=23' },
+    { id: 4, email: "test@mail.ru", username: "test4", first_name: 'James', last_name: "Wilson", avatar: 'https://i.pravatar.cc/150?img=24' },
+    { id: 5, email: "test@mail.ru", username: "test5", first_name: 'Olivia', last_name: "Martinez", avatar: 'https://i.pravatar.cc/150?img=25' },
+    { id: 6, email: "test@mail.ru", username: "test6", first_name: 'Liam', last_name: "Johnson", avatar: 'https://i.pravatar.cc/150?img=26' },
+    { id: 7, email: "test@mail.ru", username: "test7", first_name: 'Ava', last_name: "White", avatar: 'https://i.pravatar.cc/150?img=27' },
+    { id: 8, email: "test@mail.ru", username: "test8", first_name: 'Isabella', last_name: "Harris", avatar: 'https://i.pravatar.cc/150?img=28' },
+    { id: 9, email: "test@mail.ru", username: "test9", first_name: 'Noah', last_name: "Clark", avatar: 'https://i.pravatar.cc/150?img=29' },
+    { id: 10, email: "test@mail.ru", username: "test10", first_name: 'Ethan', last_name: "Lewis", avatar: 'https://i.pravatar.cc/150?img=30' },
+    { id: 11, email: "test@mail.ru", username: "test11", first_name: 'Sophia', last_name: "White", avatar: 'https://i.pravatar.cc/150?img=31' },
+    { id: 12, email: "test@mail.ru", username: "test12", first_name: 'Benjamin', last_name: "Scott", avatar: 'https://i.pravatar.cc/150?img=32' },
+    { id: 13, email: "test@mail.ru", username: "test13", first_name: 'Ella', last_name: "Thompson", avatar: 'https://i.pravatar.cc/150?img=33' },
 ];
 
 
@@ -136,7 +128,6 @@ export const chatsData: ChatItem[] = [
         isGroup: false,
     }
 ];
-
 
 export const chatMessages = [
     {

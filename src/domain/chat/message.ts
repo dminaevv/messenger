@@ -1,0 +1,51 @@
+export class Message {
+    constructor(
+        public id: number,
+        public forwarded: boolean,
+        public group_admin: boolean,
+        public group_id: number | null,
+        public user_fullname: string | null,
+        public page_id: number,
+        public unsettled_msg_id: string | null,
+        public bg: boolean,
+        public group_seen: string | null,
+        public count_group_seen: string | null,
+        public seen: string | null,
+        public message: string | null,
+        public from_id: number,
+        public timestamp: Date,
+        public time: string,
+        public read: boolean,
+        public avatar: string | null,
+        public showlastseen: string | null,
+        public uonline: string | null,
+        public currDate: number,
+        public dateMonth: string | null,
+    ) { }
+}
+
+export function mapToMessage(data: any) {
+    return new Message(
+        data.id,
+        data.forwarded == 'yes' ? true : false,
+        data.group_admin == "0" ? false : true,
+        data.group_id,
+        data.user_fullname,
+        data.page_id,
+        data.unsettled_msg_id,
+        data.bg == 'yes' ? true : false,
+        data.group_seen,
+        data.count_group_seen,
+        data.seen,
+        data.msg,
+        data.from_id,
+        new Date(data.timestamp * 1000),
+        data.time,
+        data.read == 'yes' ? true : false,
+        data.avatar != null ? (data.avatar as string).replace('https://apps.kontackt.net/', '') : null,
+        data.showlastseen,
+        data.uonline,
+        data.currDate,
+        data.dateMonth,
+    )
+}

@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, TouchableOpacity, Image, Text, TextInput, StyleSheet, FlatList, Animated, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, TouchableOpacity, Image, Text, TextInput, StyleSheet, FlatList, Animated, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
-import { colors } from '../../config/colors';
 import { ChatProvider } from '../../domain/chat/chatProvider';
 import { useAppContext } from '../../contexts/appContext';
-import { ChatItem, Message, User } from '../../config/data';
 import { Platform } from 'react-native';
 import { openSettings, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
@@ -14,15 +12,17 @@ import FastImage from 'react-native-fast-image';
 import ChatPhotoModal from './chatPhoto';
 import Avatar from '../../components/avatar';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { Links } from '../../config/links';
+import { User } from '../../domain/user/user';
+import { mapToMessage, Message } from '../../domain/chat/message';
+import Loader from '../../components/Loader';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
 export default function ChatDetailScreen({ route, navigation }: { route: any, navigation: any }) {
-    const { chatId } = route.params;
-    const { userId } = route.params;
-    const { user: me } = useAppContext()
+    const { userId, groupId, avatar, username } = route.params;
+    const { user: me, colors, isAuth, token } = useAppContext()
 
-    const [chat, setChat] = useState<ChatItem | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [users, setUsers] = useState<User[]>([]);
 
@@ -38,18 +38,35 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
 
-    const handleEmojiSelect = (emoji: string) => {
-        setMessageText((prevText) => (prevText || '') + emoji);
-    };
+    const [isMessageLoading, setIsMessageLoading] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(0);
+    const [isMoreMessages, setIsMoreMessages] = useState<boolean>(true);
+
+    // useEffect(() => {
+    //     // const allMedia = messages.filter(m => m.mediaUris).flatMap(m => m.mediaUris);
+    //     // setAllMedia(allMedia as string[]);
+    // }, [messages])
 
     useEffect(() => {
-        const allMedia = messages.filter(m => m.mediaUris).flatMap(m => m.mediaUris);
-        setAllMedia(allMedia as string[]);
-    }, [messages])
+        loadChatMessages(0);
+    }, []);
 
-    useEffect(() => {
-        loadChat();
-    }, [])
+    async function loadChatMessages(pageNumber: number) {
+        if (!isAuth || isMessageLoading || !isMoreMessages) return;
+
+        setIsMessageLoading(true);
+        const result = await ChatProvider.getMessages(token, userId, pageNumber, 15, groupId);
+        const newMessages = JSON.parse(result.data).messages.map(mapToMessage);
+
+        setIsMessageLoading(false);
+
+        if (newMessages.length > 0) {
+            setMessages(prev => [...prev, ...newMessages]);
+            setPage(pageNumber + 1);
+        } else {
+            setIsMoreMessages(false);
+        }
+    }
 
     useEffect(() => {
         if (isRecording) {
@@ -115,50 +132,15 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
         }
     };
 
-    useEffect(() => {
-        if (chat == null) return;
-
-        loadMessages();
-        loadUsers();
-
-    }, [chat])
-
-    async function loadChat() {
-        if (chatId) {
-            const chat = await ChatProvider.getChat(chatId);
-            setChat(chat);
-        }
-        else {
-            const chat: ChatItem = await ChatProvider.getChatByUser(userId);
-            setChat(chat);
-        }
-    }
-
-    async function loadMessages() {
-        if (chat == null) return;
-
-        const chatMessages = await ChatProvider.loadMessages(chat.id);
-        setMessages(chatMessages.messages);
-    }
-
-    async function loadUsers() {
-        const users = await ChatProvider.getUsers();
-        setUsers(users);
-    }
-
     const handleSendMessage = () => {
-        if (messageText && messageText.trim()) {
-            setMessages(prevMessages => [
-                ...prevMessages,
-                { id: Date.now().toString(), text: messageText, userId: me!.id }
-            ]);
-            setMessageText(null);
-        }
+        // if (messageText && messageText.trim()) {
+        //     setMessages(prevMessages => [
+        //         ...prevMessages,
+        //         { id: Date.now().toString(), text: messageText, userId: me!.id }
+        //     ]);
+        //     setMessageText(null);
+        // }
     };
-
-    function getUserById(userId: string) {
-        return users.find(u => u.id == userId)!;
-    }
 
     const handleStartRecording = async () => {
         const permissionResult = await requestMicrophonePermission();
@@ -216,22 +198,22 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
     };
 
     const handleAttachMedia = async () => {
-        const result = await launchImageLibrary({
-            mediaType: 'photo',
-            quality: 1,
-            selectionLimit: 50,
-        });
+        // const result = await launchImageLibrary({
+        //     mediaType: 'photo',
+        //     quality: 1,
+        //     selectionLimit: 50,
+        // });
 
-        if (result.didCancel) return;
+        // if (result.didCancel) return;
 
-        if (result.assets && result.assets.length > 0) {
-            const mediaUris = result.assets.map(asset => asset.uri!);
-            setMessages(prev => [
-                ...prev,
-                { id: Date.now().toString(), text: messageText ?? "", userId: me!.id, mediaUris }
-            ]);
-            setMessageText(null);
-        }
+        // if (result.assets && result.assets.length > 0) {
+        //     const mediaUris = result.assets.map(asset => asset.uri!);
+        //     setMessages(prev => [
+        //         ...prev,
+        //         { id: Date.now().toString(), text: messageText ?? "", userId: me!.id, mediaUris }
+        //     ]);
+        //     setMessageText(null);
+        // }
     };
 
     const handleImagePress = (uri: string) => {
@@ -291,22 +273,23 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
     };
 
     const renderMessage = ({ item }: { item: Message }) => {
-        const isMyMessage = item.userId === me!.id;
-        const user = isMyMessage ? me! : getUserById(item.userId);
-        const hasText = item.text && item.text.trim().length > 0; // проверяем, есть ли текст
+        if (!isAuth) throw new Error("");
+
+        const isMyMessage = item.from_id === me!.id;
+        const hasText = item.message && item.message.trim().length > 0;
 
         return (
             <View style={[styles.messageContainer, isMyMessage ? styles.myMessageContainer : styles.userMessageContainer]}>
                 {!isMyMessage && (
-                    <Avatar username={user.userName} avatarUrl={user.avatar} style={styles.avatar} size={40} />
+                    <Avatar username={username} avatarUrl={avatar} style={styles.avatar} size={40} />
                 )}
                 <View style={styles.messageContent}>
-                    {!isMyMessage && <Text style={styles.senderName}>{user.name}</Text>}
-                    <View style={[styles.messageBubble, isMyMessage ? (hasText ? styles.myMessage : styles.myMessageNoText) : styles.userMessage]}>
-                        {item.mediaUris && renderMediaGrid(item.mediaUris)}
-                        {item.text && (
-                            <Text style={isMyMessage ? styles.myMessageText : styles.userMessageText}>
-                                {item.text}
+                    {!isMyMessage && <Text style={[styles.senderName, { color: colors.textPlaceholderColor }]}>{username}</Text>}
+                    <View style={[styles.messageBubble, isMyMessage ? (hasText ? (styles.myMessage, { backgroundColor: colors.primary }) : styles.myMessageNoText) : (styles.userMessage, { backgroundColor: colors.lightGray })]}>
+                        {/* {item.mediaUris && renderMediaGrid(item.mediaUris)} */}
+                        {item.message && (
+                            <Text style={isMyMessage ? styles.myMessageText : { color: colors.text }}>
+                                {item.message}
                             </Text>
                         )}
                     </View>
@@ -316,50 +299,50 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
     };
 
     return (
-        <View style={styles.chatContainer}>
+        <View style={[styles.chatContainer, { backgroundColor: colors.background }]}>
             {
                 selectedImageIndex != null &&
                 <ChatPhotoModal images={allMedia} selectedIndex={selectedImageIndex} onClose={() => setSelectedImageIndex(null)} />
             }
-            {
-                chat != null &&
-                <View style={styles.chatHeader}>
-                    <View style={styles.headerLeft}>
-                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                            <Icon name="angle-left" size={35} color={colors.darkPrimary} />
-                        </TouchableOpacity>
+            <View style={[styles.chatHeader, { backgroundColor: colors.bottomMenuBackGroundColor, borderBottomColor: colors.lightGray }]}>
+                <View style={styles.headerLeft}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Icon name="angle-left" size={35} color={colors.darkPrimary} />
+                    </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={styles.headerInfoContainer}
-                            onPress={() => navigation.navigate('ChatSettings', { chatId, userId: chat.user.id })}
-                        >
-                            <Avatar username={chat.user.userName} avatarUrl={chat.user.avatar} style={styles.avatar} size={30} />
-                            <Text style={styles.headerName}>{chat.user.name}</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.headerActionButton}>
-                        <TouchableOpacity>
-                            <IoniconsIcon name="call" size={22} color={colors.darkPrimary} />
-                        </TouchableOpacity>
-                        <TouchableOpacity>
-                            <IoniconsIcon name="videocam" size={22} color={colors.darkPrimary} />
-                        </TouchableOpacity>
-                        <TouchableOpacity>
-                            <IoniconsIcon name="information-circle" size={22} color={colors.darkPrimary} />
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity
+                        style={styles.headerInfoContainer}
+                        onPress={() => navigation.navigate(Links.Chat.Settings, { userId, groupId })}
+                    >
+                        <Avatar username={username} avatarUrl={avatar} style={styles.avatar} size={30} />
+                        <Text style={[styles.headerName, { color: colors.text }]}>{username}</Text>
+                    </TouchableOpacity>
                 </View>
-            }
+
+                <View style={styles.headerActionButton}>
+                    <TouchableOpacity>
+                        <IoniconsIcon name="call" size={22} color={colors.darkPrimary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <IoniconsIcon name="videocam" size={22} color={colors.darkPrimary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <IoniconsIcon name="information-circle" size={22} color={colors.darkPrimary} />
+                    </TouchableOpacity>
+                </View>
+            </View>
             <FlatList
-                data={[...messages].reverse()}
+                data={messages}
                 renderItem={renderMessage}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.messagesContainer}
                 inverted
+                ListFooterComponent={isMessageLoading ? <Loader /> : null}
+                onEndReached={() => loadChatMessages(page)}
+                onEndReachedThreshold={0.1}
             />
 
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, { backgroundColor: colors.bottomMenuBackGroundColor }]}>
                 {
                     isRecording ? (
                         <View style={styles.recordingContainer}>
@@ -369,7 +352,7 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                                     { opacity: dotOpacity },
                                 ]}
                             />
-                            <Text style={styles.recordingText}>
+                            <Text style={{ color: colors.text }}>
                                 {recordingTime}
                             </Text>
                         </View>
@@ -381,9 +364,10 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                                 </TouchableOpacity>
                                 <TextInput
                                     placeholder="Message"
-                                    style={styles.textInput}
+                                    style={[styles.textInput, { color: colors.text, backgroundColor: colors.inputBackgroundColor }]}
                                     value={messageText ?? ""}
                                     onChangeText={setMessageText}
+                                    placeholderTextColor={colors.textPlaceholderColor}
                                     multiline
                                     numberOfLines={4}
                                 />
@@ -397,7 +381,7 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                         <IoniconsIcon name="happy-outline" size={25} color={colors.darkPrimary} />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={styles.sendButton}
+                        style={[styles.sendButton, { backgroundColor: colors.primary }]}
                         onPress={messageText?.trim() ? handleSendMessage : undefined}
                         onLongPress={!messageText?.trim() ? handleStartRecording : undefined}
                         onPressOut={!messageText?.trim() ? handleStopRecording : undefined}
@@ -406,17 +390,13 @@ export default function ChatDetailScreen({ route, navigation }: { route: any, na
                     </TouchableOpacity>
                 </View>
             </View>
-            {/* <EmojiBoard
-                showBoard onClick={() => { }}
-            /> */}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     chatContainer: {
-        flex: 1,
-        backgroundColor: '#ffffff',
+        flex: 1
     },
     headerLeft: {
         flexDirection: 'row',
@@ -438,18 +418,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         marginRight: moderateScale(8),
     },
-    recordingText: {
-        color: colors.textColor,
-    },
     chatHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: scale(10),
         paddingVertical: verticalScale(5),
-        borderBottomWidth: moderateScale(1),
-        borderBottomColor: '#f0f0f0',
-        backgroundColor: '#f9f9f9',
+        borderBottomWidth: moderateScale(1)
     },
     backButton: {
         flexDirection: 'row',
@@ -473,24 +448,22 @@ const styles = StyleSheet.create({
     },
     messagesContainer: {
         paddingHorizontal: scale(10),
+        paddingVertical: verticalScale(10),
     },
     inputContainer: {
         flexDirection: 'row',
         paddingHorizontal: scale(10),
-        paddingVertical: verticalScale(10),
+        paddingVertical: verticalScale(5),
         alignItems: 'center',
     },
     textInput: {
         flex: 1,
         borderRadius: moderateScale(20),
         padding: moderateScale(10),
-        backgroundColor: '#f2f2f2',
-        color: colors.textColor,
         height: 40,
         marginRight: 5,
     },
     sendButton: {
-        backgroundColor: colors.primary,
         width: moderateScale(35),
         height: moderateScale(35),
         borderRadius: moderateScale(20),
@@ -517,7 +490,6 @@ const styles = StyleSheet.create({
     },
     senderName: {
         fontSize: moderateScale(12),
-        color: '#555',
         marginBottom: verticalScale(2),
     },
     messageBubble: {
@@ -525,7 +497,6 @@ const styles = StyleSheet.create({
         borderRadius: moderateScale(18),
     },
     myMessage: {
-        backgroundColor: colors.primary,
         alignSelf: 'flex-end',
     },
     myMessageNoText: {
@@ -533,14 +504,10 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
     },
     userMessage: {
-        backgroundColor: colors.lightGray,
         alignSelf: 'flex-start',
     },
     myMessageText: {
         color: '#ffffff',
-    },
-    userMessageText: {
-        color: '#000',
     },
     attachButton: {
         marginRight: scale(10),

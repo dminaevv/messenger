@@ -72,3 +72,5 @@ ios/tmp.xcconfig
 
 # android bundle
 *.aab
+
+.env

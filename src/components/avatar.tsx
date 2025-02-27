@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, ViewStyle } from 'react-native';
+import { IMAGE_BASE_URL } from '@env';
 
 interface IProps {
     username: string;
@@ -13,16 +14,18 @@ export default function Avatar({ username, avatarUrl, size = 50, style }: IProps
 
     return (
         <View style={[styles.container, { width: size, height: size }, style]}>
-            {avatarUrl ? (
-                <Image
-                    source={{ uri: avatarUrl }}
-                    style={[styles.avatarImage, { width: size, height: size, borderRadius: size / 2 }]}
-                />
-            ) : (
-                <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-                    <Text style={[styles.initialText, { fontSize: size * 0.4 }]}>{firstLetter}</Text>
-                </View>
-            )}
+            {
+                avatarUrl ? (
+                    <Image
+                        source={{ uri: `${IMAGE_BASE_URL}${avatarUrl}` }}
+                        style={[styles.avatarImage, { width: size, height: size, borderRadius: size / 2 }]}
+                    />
+                ) : (
+                    <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
+                        <Text style={[styles.initialText, { fontSize: size * 0.4 }]}>{firstLetter}</Text>
+                    </View>
+                )
+            }
         </View>
     );
 }

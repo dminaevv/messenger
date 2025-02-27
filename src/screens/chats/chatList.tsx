@@ -1,37 +1,67 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { format, isToday, isYesterday, isThisWeek, isThisYear } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { colors } from '../../config/colors';
-import { ChatItem, chatsData, User } from '../../config/data';
+import { ChatItem, chatsData } from '../../config/data';
 import { ChatProvider } from '../../domain/chat/chatProvider';
 import Avatar from '../../components/avatar';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useAppContext } from '../../contexts/appContext';
+import { Links } from '../../config/links';
+import { User } from '../../domain/user/user';
+import { Chat, mapToChat } from '../../domain/chat/chat';
+import Loader from '../../components/Loader';
 
 export default function ChatListScreen({ navigation }: { navigation: any }) {
+    const { colors, isAuth, token } = useAppContext();
     const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const [originalChats, setOriginalChats] = useState<Chat[]>([]);
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [isLoadingChats, setIsLoadingChats] = useState<boolean>(false);
 
     useEffect(() => {
         loadOnlineUsers();
-    }, [])
+        loadChats();
+    }, []);
 
     async function loadOnlineUsers() {
         const onlineUsers = await ChatProvider.getOnlineUsers();
         setOnlineUsers(onlineUsers);
     }
-    const sortedChats = chatsData.sort((a, b) => {
-        const timeA = a.time ? a.time.getTime() : new Date(0).getTime();
-        const timeB = b.time ? b.time.getTime() : new Date(0).getTime();
-        return timeB - timeA;
-    });
+
+    async function loadChats() {
+        if (!isAuth) return;
+
+        setIsLoadingChats(true);
+        const result = await ChatProvider.getChats(token);
+        setIsLoadingChats(false);
+        const chatList = (result.data as any[]).map(mapToChat);
+        setChats(chatList);
+        setOriginalChats(chatList);
+    }
+
+    async function handleSearch(text: string) {
+        if (!isAuth) return;
+
+        setSearchQuery(text);
+
+        // if (text.trim() === '') return setChats(originalChats);
+
+        // setIsLoadingChats(true);
+        // const result = await ChatProvider.search(token, text);
+        // setChats((result.data as any[]).map(mapToChat));
+        // setIsLoadingChats(false);
+
+    }
 
     function formatChatTime(date: Date) {
         if (isToday(date)) {
             return format(date, 'HH:mm', { locale: ru });
         } else if (isYesterday(date)) {
-            return 'вчера';
+            return 'yesterday';
         } else if (isThisWeek(date)) {
             return format(date, 'EEEE', { locale: ru });
         } else if (isThisYear(date)) {
@@ -41,84 +71,93 @@ export default function ChatListScreen({ navigation }: { navigation: any }) {
         }
     }
 
-    const renderChatItem = (item: ChatItem) => (
+    const renderChatItem = (item: Chat) => (
         <TouchableOpacity
-            style={styles.chatItem}
-            onPress={() => navigation.navigate('ChatDetail', { chatId: item.id })}
+            style={[styles.chatItem, { borderBottomColor: colors.lightGray }]}
+            onPress={() => navigation.navigate(Links.Chat.Detail, { userId: item.user_id, groupId: item.group_id, username: item.username, avatar: item.avatar })}
         >
-            <Avatar avatarUrl={item.user.avatar} username={item.user.userName} />
+            <Avatar avatarUrl={item.avatar} username={item.username} />
             <View style={styles.chatInfo}>
                 <View style={styles.chatHeader}>
-                    <Text style={styles.chatName}>{item.user.name}</Text>
-                    {item.time != null && <Text style={styles.chatTime}>{formatChatTime(item.time)}</Text>}
+                    <Text style={[styles.chatName, { color: colors.text }]}>{item.username}</Text>
+                    {item.time != null && (
+                        <Text style={[styles.chatTime, { color: colors.gray }]}>{formatChatTime(item.time)}</Text>
+                    )}
                 </View>
-                <Text style={styles.lastMessage} numberOfLines={1}>
-                    {item.isGroup && item.lastMessageSender ? `${item.lastMessageSender}: ` : ''}
-                    {item.lastMessage}
+                <Text style={[styles.lastMessage, { color: colors.gray }]} numberOfLines={1}>
+                    {item.text}
                 </Text>
             </View>
         </TouchableOpacity>
     );
 
-    const renderOnlineUser = ({ item }: { item: User }) => (
-        <TouchableOpacity
-            style={styles.onlineUserContainer}
-            onPress={() => navigation.navigate('ChatDetail', { userId: item.id })}
-        >
-            <View style={styles.onlineAvatarContainer} >
-                <Avatar username={item.userName} avatarUrl={item.avatar} style={styles.onlineAvatar} />
-                <View style={styles.onlineIndicator} />
-            </View>
-            <Text style={styles.onlineUserName}>{item.name}</Text>
-        </TouchableOpacity>
-    );
+    // const renderOnlineUser = ({ item }: { item: User }) => (
+    //     <TouchableOpacity
+    //         style={styles.onlineUserContainer}
+    //         onPress={() => navigation.navigate(Links.Chat.Detail, { userId: item.id })}
+    //     >
+    //         <View style={styles.onlineAvatarContainer} >
+    //             <Avatar username={item.username} avatarUrl={item.avatar} style={styles.onlineAvatar} />
+    //             <View style={styles.onlineIndicator} />
+    //         </View>
+    //         <Text style={styles.onlineUserName}>{item.first_name}</Text>
+    //     </TouchableOpacity>
+    // );
 
     return (
-        <FlatList
-            contentContainerStyle={{ backgroundColor: '#fff', }}
-            ListHeaderComponent={
-                <>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+            <FlatList
+                contentContainerStyle={{ paddingBottom: 20 }}
+                ListHeaderComponent={
                     <View style={styles.container}>
                         <View style={styles.header}>
-                            <Text style={styles.headerText}>Contacts</Text>
+                            <Text style={[styles.headerText, { color: colors.text }]}>Contacts</Text>
                         </View>
 
-                        <View style={styles.searchInputContainer}>
+                        <View style={[styles.searchInputContainer, { backgroundColor: colors.inputBackgroundColor }]}>
                             <Icon name="search" size={14} color={colors.textPlaceholderColor} />
                             <TextInput
-                                style={styles.searchInput}
+                                style={[styles.searchInput, { color: colors.text }]}
                                 placeholder="Search"
+                                placeholderTextColor={colors.textPlaceholderColor}
                                 value={searchQuery}
-                                onChangeText={setSearchQuery}
+                                onChangeText={handleSearch}
                             />
                         </View>
 
-                        <FlatList
+                        {/* <FlatList
                             data={onlineUsers}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={renderOnlineUser}
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             style={styles.onlineUsersList}
-                        />
+                        /> */}
                     </View>
-                </>
-            }
-            data={sortedChats}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => renderChatItem(item)}
-        />
+                }
+                data={chats}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => renderChatItem(item)}
+                ListFooterComponent={
+                    isLoadingChats ? (
+                        <Loader />
+                    ) : null
+                }
+                ListEmptyComponent={
+                    isLoadingChats ? null : (
+                        <View style={{ padding: 20, alignItems: 'center' }}>
+                            <Text style={{ color: colors.text }}>No contacts found</Text>
+                        </View>
+                    )
+                }
+            />
+        </View>
     );
 }
 
 export const styles = StyleSheet.create({
-    scrollViewContainer: {
-        flexGrow: 1,
-        paddingBottom: verticalScale(20),
-    },
     container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
     header: {
         padding: moderateScale(16),
@@ -126,13 +165,11 @@ export const styles = StyleSheet.create({
     headerText: {
         fontSize: moderateScale(18),
         fontWeight: 'bold',
-        color: colors.textColor,
     },
     chatItem: {
         flexDirection: 'row',
         padding: moderateScale(10),
         borderBottomWidth: 0.5,
-        borderBottomColor: '#f0f0f0',
     },
     searchInputContainer: {
         flexDirection: 'row',
@@ -140,14 +177,12 @@ export const styles = StyleSheet.create({
         marginHorizontal: scale(10),
         marginBottom: verticalScale(10),
         borderRadius: moderateScale(18),
-        backgroundColor: '#f2f2f2',
         paddingHorizontal: scale(10),
-        height: verticalScale(35),
+        height: 40,
     },
     searchInput: {
         flex: 1,
         marginLeft: scale(5),
-        color: colors.textColor,
     },
     chatInfo: {
         flex: 1,
@@ -163,11 +198,9 @@ export const styles = StyleSheet.create({
         fontSize: moderateScale(17),
     },
     chatTime: {
-        color: '#808080',
         fontSize: moderateScale(12),
     },
     lastMessage: {
-        color: '#808080',
         marginTop: verticalScale(2),
         fontSize: moderateScale(14),
     },
@@ -198,6 +231,5 @@ export const styles = StyleSheet.create({
     onlineUserName: {
         marginTop: verticalScale(4),
         fontSize: moderateScale(12),
-        color: colors.textColor,
     },
 });
